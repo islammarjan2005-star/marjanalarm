@@ -1,0 +1,1603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#0A0E1A">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>MarjanAlarm - Wake up with Dhikr</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #0A0E1A;
+      --bg-secondary: #111827;
+      --bg-tertiary: #1F2937;
+      --surface-primary: #1F2937;
+      --surface-secondary: #374151;
+      --text-primary: #FFFFFF;
+      --text-secondary: #9CA3AF;
+      --text-tertiary: #6B7280;
+      --accent-primary: #14B8A6;
+      --accent-secondary: #0D9488;
+      --accent-light: #5EEAD4;
+      --success: #22C55E;
+      --warning: #F59E0B;
+      --error: #DC2626;
+      --border-primary: #374151;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .arabic {
+      font-family: 'Amiri', serif;
+      direction: rtl;
+    }
+
+    /* App Container */
+    #app {
+      max-width: 430px;
+      margin: 0 auto;
+      min-height: 100vh;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Screen base */
+    .screen {
+      display: none;
+      min-height: 100vh;
+      flex-direction: column;
+      background: linear-gradient(180deg, var(--bg-primary) 0%, #1E1B4B 100%);
+    }
+
+    .screen.active {
+      display: flex;
+    }
+
+    /* Safe area padding */
+    .safe-area {
+      padding: 48px 24px 34px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Typography */
+    h1 { font-size: 36px; font-weight: 700; line-height: 1.1; }
+    h2 { font-size: 28px; font-weight: 700; line-height: 1.2; }
+    h3 { font-size: 24px; font-weight: 600; line-height: 1.3; }
+    h4 { font-size: 20px; font-weight: 600; line-height: 1.3; }
+    .body-large { font-size: 18px; line-height: 1.6; }
+    .body-medium { font-size: 16px; line-height: 1.6; }
+    .body-small { font-size: 13px; line-height: 1.5; }
+    .label { font-size: 13px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
+
+    .text-secondary { color: var(--text-secondary); }
+    .text-tertiary { color: var(--text-tertiary); }
+    .text-accent { color: var(--accent-primary); }
+    .text-center { text-align: center; }
+
+    /* Buttons */
+    .btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px 32px;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: none;
+      width: 100%;
+    }
+
+    .btn-primary {
+      background: var(--accent-primary);
+      color: var(--bg-primary);
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-secondary);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--text-primary);
+      border: 1px solid var(--border-primary);
+    }
+
+    .btn-secondary:hover {
+      background: var(--surface-primary);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--accent-primary);
+    }
+
+    .btn-danger {
+      background: var(--error);
+      color: white;
+    }
+
+    .btn-sm {
+      padding: 10px 16px;
+      font-size: 14px;
+    }
+
+    .btn-lg {
+      padding: 20px 32px;
+      font-size: 18px;
+    }
+
+    /* Cards */
+    .card {
+      background: var(--surface-primary);
+      border-radius: 16px;
+      padding: 16px;
+    }
+
+    .card-outlined {
+      background: transparent;
+      border: 1px solid var(--border-primary);
+    }
+
+    .card-highlight {
+      border: 1px solid var(--accent-primary);
+    }
+
+    /* Form elements */
+    .input {
+      width: 100%;
+      padding: 16px;
+      background: var(--surface-primary);
+      border: 1px solid var(--border-primary);
+      border-radius: 12px;
+      color: var(--text-primary);
+      font-size: 16px;
+      outline: none;
+    }
+
+    .input:focus {
+      border-color: var(--accent-primary);
+    }
+
+    /* Toggle/Switch */
+    .toggle {
+      position: relative;
+      width: 52px;
+      height: 32px;
+      background: var(--border-primary);
+      border-radius: 16px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .toggle.active {
+      background: var(--accent-primary);
+    }
+
+    .toggle::after {
+      content: '';
+      position: absolute;
+      width: 26px;
+      height: 26px;
+      background: white;
+      border-radius: 13px;
+      top: 3px;
+      left: 3px;
+      transition: transform 0.2s;
+    }
+
+    .toggle.active::after {
+      transform: translateX(20px);
+    }
+
+    /* Radio button */
+    .radio {
+      width: 24px;
+      height: 24px;
+      border: 2px solid var(--accent-primary);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .radio.selected::after {
+      content: '';
+      width: 12px;
+      height: 12px;
+      background: var(--accent-primary);
+      border-radius: 6px;
+    }
+
+    /* Progress dots */
+    .progress-dots {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+    }
+
+    .progress-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 4px;
+      background: var(--border-primary);
+      border: 1px solid var(--border-primary);
+    }
+
+    .progress-dot.completed {
+      background: var(--accent-primary);
+      border-color: var(--accent-primary);
+    }
+
+    .progress-dot.current {
+      width: 12px;
+      height: 12px;
+      border-radius: 6px;
+      background: var(--accent-light);
+      border-color: var(--accent-light);
+    }
+
+    /* Day selector */
+    .day-selector {
+      display: flex;
+      gap: 8px;
+    }
+
+    .day-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 20px;
+      background: var(--surface-primary);
+      border: 1px solid var(--border-primary);
+      color: var(--text-secondary);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .day-btn.active {
+      background: var(--accent-primary);
+      border-color: var(--accent-primary);
+      color: var(--bg-primary);
+    }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.7);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 24px;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal {
+      background: var(--surface-primary);
+      border-radius: 24px;
+      padding: 24px;
+      width: 100%;
+      max-width: 360px;
+    }
+
+    .modal-bottom {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--bg-secondary);
+      border-radius: 24px 24px 0 0;
+      padding: 24px;
+      padding-bottom: 48px;
+      transform: translateY(100%);
+      transition: transform 0.3s ease;
+    }
+
+    .modal-bottom.active {
+      transform: translateY(0);
+    }
+
+    /* Tab bar */
+    .tab-bar {
+      display: flex;
+      background: var(--surface-primary);
+      border-top: 1px solid var(--border-primary);
+      padding: 8px 0 24px;
+      position: sticky;
+      bottom: 0;
+    }
+
+    .tab-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      padding: 8px;
+      cursor: pointer;
+      opacity: 0.6;
+    }
+
+    .tab-item.active {
+      opacity: 1;
+    }
+
+    .tab-item.active .tab-label {
+      color: var(--accent-primary);
+    }
+
+    .tab-icon {
+      font-size: 24px;
+    }
+
+    .tab-label {
+      font-size: 11px;
+      font-weight: 500;
+      text-transform: uppercase;
+      color: var(--text-tertiary);
+    }
+
+    /* Welcome Screen */
+    #welcome .content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .crescent-icon {
+      width: 160px;
+      height: 160px;
+      position: relative;
+      margin-bottom: 48px;
+    }
+
+    .crescent {
+      position: absolute;
+      width: 80px;
+      height: 80px;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    .crescent-outer {
+      width: 80px;
+      height: 80px;
+      border-radius: 40px;
+      background: var(--accent-primary);
+    }
+
+    .crescent-inner {
+      position: absolute;
+      width: 64px;
+      height: 64px;
+      border-radius: 32px;
+      background: #1E1B4B;
+      top: -8px;
+      left: 20px;
+    }
+
+    .geometric-lines {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+    }
+
+    .geometric-line {
+      position: absolute;
+      width: 100%;
+      height: 1px;
+      background: var(--accent-primary);
+      opacity: 0.1;
+      top: 50%;
+      left: 0;
+      transform-origin: center;
+    }
+
+    .link {
+      color: var(--text-tertiary);
+      text-decoration: underline;
+      cursor: pointer;
+      padding: 12px;
+    }
+
+    /* Time Picker */
+    .time-picker {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .time-column {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .time-arrow {
+      color: var(--accent-primary);
+      font-size: 24px;
+      cursor: pointer;
+      padding: 8px;
+      user-select: none;
+    }
+
+    .time-value {
+      font-size: 64px;
+      font-weight: 700;
+      width: 100px;
+      text-align: center;
+    }
+
+    .time-colon {
+      font-size: 64px;
+      font-weight: 700;
+      margin: 0 4px;
+      margin-bottom: 16px;
+    }
+
+    /* Alarm Card */
+    .alarm-card {
+      background: var(--surface-primary);
+      border-radius: 20px;
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+
+    .alarm-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .dua-lock-pill {
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 500;
+      text-transform: uppercase;
+    }
+
+    .dua-lock-active {
+      background: rgba(20, 184, 166, 0.2);
+      color: var(--accent-primary);
+    }
+
+    .alarm-time {
+      font-size: 56px;
+      font-weight: 700;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .alarm-name {
+      font-size: 18px;
+      color: var(--text-secondary);
+      margin-bottom: 12px;
+    }
+
+    .alarm-adhkar {
+      font-size: 14px;
+      color: var(--text-tertiary);
+      margin-bottom: 16px;
+    }
+
+    .alarm-actions {
+      display: flex;
+      gap: 12px;
+    }
+
+    .alarm-actions .btn {
+      flex: 1;
+    }
+
+    /* Ringing Screen */
+    #ringing {
+      background: linear-gradient(180deg, var(--bg-primary) 0%, #0D0B1E 100%);
+    }
+
+    .ringing-time {
+      font-size: 80px;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 8px;
+    }
+
+    .dua-card {
+      background: rgba(31, 41, 55, 0.8);
+      border-radius: 20px;
+      padding: 24px;
+      text-align: center;
+    }
+
+    .dua-arabic {
+      font-size: 28px;
+      line-height: 2;
+      margin-bottom: 16px;
+      color: #F3F4F6;
+    }
+
+    .dua-transliteration {
+      font-size: 16px;
+      font-style: italic;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+    }
+
+    .dua-translation {
+      font-size: 14px;
+      color: var(--text-tertiary);
+    }
+
+    .voice-indicator {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      margin: 24px 0;
+    }
+
+    .voice-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 24px;
+      background: var(--accent-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+
+    .voice-icon.listening {
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.2); opacity: 0.8; }
+    }
+
+    .waveform {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      height: 32px;
+    }
+
+    .wave-bar {
+      width: 4px;
+      background: var(--accent-primary);
+      border-radius: 2px;
+      animation: wave 0.6s infinite ease-in-out;
+    }
+
+    .wave-bar:nth-child(1) { animation-delay: 0s; }
+    .wave-bar:nth-child(2) { animation-delay: 0.1s; }
+    .wave-bar:nth-child(3) { animation-delay: 0.2s; }
+    .wave-bar:nth-child(4) { animation-delay: 0.3s; }
+    .wave-bar:nth-child(5) { animation-delay: 0.4s; }
+
+    @keyframes wave {
+      0%, 100% { height: 8px; }
+      50% { height: 24px; }
+    }
+
+    /* Progress Screen */
+    .stats-card {
+      display: flex;
+      align-items: center;
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+
+    .stat-item {
+      flex: 1;
+      text-align: center;
+    }
+
+    .stat-number {
+      font-size: 48px;
+      font-weight: 700;
+      color: var(--accent-primary);
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .stat-label {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    .stat-divider {
+      width: 1px;
+      height: 60px;
+      background: var(--border-primary);
+    }
+
+    .weekly-view {
+      display: flex;
+      justify-content: space-between;
+      background: var(--surface-primary);
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 24px;
+    }
+
+    .weekly-day {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .weekly-indicator {
+      width: 36px;
+      height: 36px;
+      border-radius: 18px;
+      background: var(--border-primary);
+      border: 1px solid var(--border-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      color: var(--bg-primary);
+    }
+
+    .weekly-indicator.completed {
+      background: var(--accent-primary);
+      border-color: var(--accent-primary);
+    }
+
+    .weekly-indicator.skipped {
+      background: var(--warning);
+      border-color: var(--warning);
+    }
+
+    .weekly-label {
+      font-size: 11px;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+    }
+
+    .history-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding: 16px;
+      background: var(--surface-primary);
+      border-radius: 12px;
+      margin-bottom: 8px;
+    }
+
+    .history-status {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 4px;
+    }
+
+    .status-dot.completed { background: var(--accent-primary); }
+    .status-dot.skipped { background: var(--warning); }
+
+    /* Success Screen */
+    .success-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 24px;
+    }
+
+    .success-emoji {
+      font-size: 64px;
+      margin-bottom: 24px;
+    }
+
+    /* Animations */
+    .fade-in {
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Utilities */
+    .flex { display: flex; }
+    .flex-col { flex-direction: column; }
+    .flex-1 { flex: 1; }
+    .items-center { align-items: center; }
+    .justify-center { justify-content: center; }
+    .justify-between { justify-content: space-between; }
+    .gap-8 { gap: 8px; }
+    .gap-12 { gap: 12px; }
+    .gap-16 { gap: 16px; }
+    .gap-24 { gap: 24px; }
+    .mb-8 { margin-bottom: 8px; }
+    .mb-12 { margin-bottom: 12px; }
+    .mb-16 { margin-bottom: 16px; }
+    .mb-24 { margin-bottom: 24px; }
+    .mb-32 { margin-bottom: 32px; }
+    .mt-16 { margin-top: 16px; }
+    .mt-24 { margin-top: 24px; }
+    .p-16 { padding: 16px; }
+    .w-full { width: 100%; }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <!-- Welcome Screen -->
+    <div id="welcome" class="screen active">
+      <div class="safe-area">
+        <div class="content">
+          <div class="crescent-icon">
+            <div class="geometric-lines">
+              <div class="geometric-line" style="transform: rotate(0deg)"></div>
+              <div class="geometric-line" style="transform: rotate(45deg)"></div>
+              <div class="geometric-line" style="transform: rotate(90deg)"></div>
+              <div class="geometric-line" style="transform: rotate(135deg)"></div>
+            </div>
+            <div class="crescent">
+              <div class="crescent-outer"></div>
+              <div class="crescent-inner"></div>
+            </div>
+          </div>
+          <h1 class="text-center mb-16">Wake up with dhikr.</h1>
+          <p class="body-large text-secondary text-center" style="max-width: 280px;">
+            An alarm that only turns off when you remember Allah.
+          </p>
+        </div>
+        <div>
+          <button class="btn btn-primary btn-lg" onclick="goToScreen('language')">Begin</button>
+          <p class="link text-center mt-16" onclick="showModal('privacy-modal')">Why mic access is needed</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Language Screen -->
+    <div id="language" class="screen">
+      <div class="safe-area">
+        <h2 class="text-center mb-32">How do you want to see the duas?</h2>
+
+        <div class="flex flex-col gap-12 mb-24">
+          <div class="card card-highlight" onclick="selectDisplayMode(this, 'full')" data-selected="true">
+            <div class="flex items-center gap-12">
+              <div class="radio selected"></div>
+              <div>
+                <p class="body-medium">Arabic + Transliteration + Translation</p>
+                <p class="body-small text-tertiary">Full display with all text</p>
+              </div>
+            </div>
+          </div>
+          <div class="card card-outlined" onclick="selectDisplayMode(this, 'translit')">
+            <div class="flex items-center gap-12">
+              <div class="radio"></div>
+              <div>
+                <p class="body-medium">Arabic + Transliteration</p>
+                <p class="body-small text-tertiary">For those learning pronunciation</p>
+              </div>
+            </div>
+          </div>
+          <div class="card card-outlined" onclick="selectDisplayMode(this, 'arabic')">
+            <div class="flex items-center gap-12">
+              <div class="radio"></div>
+              <div>
+                <p class="body-medium">Arabic only</p>
+                <p class="body-small text-tertiary">Minimal, focused display</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <p class="label text-secondary mb-8">Font size</p>
+        <div class="flex gap-8 mb-24" style="background: var(--surface-primary); border-radius: 12px; padding: 4px;">
+          <button class="btn btn-sm" style="flex:1; background: transparent;" onclick="selectFontSize(this, 'small')">Small</button>
+          <button class="btn btn-sm" style="flex:1; background: var(--accent-primary); color: var(--bg-primary);" onclick="selectFontSize(this, 'medium')">Medium</button>
+          <button class="btn btn-sm" style="flex:1; background: transparent;" onclick="selectFontSize(this, 'large')">Large</button>
+        </div>
+
+        <p class="label text-secondary mb-8">Preview</p>
+        <div class="card mb-24">
+          <p class="arabic dua-arabic" style="font-size: 22px;">بِسْمِ ٱللَّٰهِ الَّذِي لَا يَضُرُّ مَعَ اسْمِهِ شَيْءٌ</p>
+          <p class="dua-transliteration" id="preview-translit">Bismillāhil-ladhī lā yaḍurru maʿas-mihi shay'un</p>
+          <p class="dua-translation" id="preview-translation">In the Name of Allah, with whose Name nothing can cause harm</p>
+        </div>
+
+        <div class="flex-1"></div>
+        <button class="btn btn-primary btn-lg" onclick="goToScreen('intensity')">Continue</button>
+      </div>
+    </div>
+
+    <!-- Intensity Screen -->
+    <div id="intensity" class="screen">
+      <div class="safe-area">
+        <h2 class="text-center mb-32">How much do you want to recite when the alarm rings?</h2>
+
+        <div class="flex flex-col gap-12 mb-16">
+          <div class="card card-outlined" onclick="selectIntensity(this, 'light')">
+            <div class="flex justify-between items-center mb-8">
+              <span style="font-size: 32px;">🌙</span>
+              <div class="radio"></div>
+            </div>
+            <h4 class="mb-4">Light</h4>
+            <p class="body-medium text-secondary">1–2 short duas, ~20 seconds</p>
+          </div>
+          <div class="card card-highlight" onclick="selectIntensity(this, 'standard')" data-selected="true">
+            <div class="flex justify-between items-center mb-8">
+              <span style="font-size: 32px;">⭐</span>
+              <div class="radio selected"></div>
+            </div>
+            <h4 class="mb-4">Standard</h4>
+            <p class="body-medium text-secondary">Core morning adhkar, ~1–2 minutes</p>
+          </div>
+          <div class="card card-outlined" onclick="selectIntensity(this, 'full')">
+            <div class="flex justify-between items-center mb-8">
+              <span style="font-size: 32px;">✨</span>
+              <div class="radio"></div>
+            </div>
+            <h4 class="mb-4">Full</h4>
+            <p class="body-medium text-secondary">Extended adhkar set, ~5+ minutes</p>
+          </div>
+        </div>
+
+        <p class="body-small text-tertiary text-center mb-24">You can change this later for each alarm.</p>
+
+        <div class="flex-1"></div>
+        <button class="btn btn-primary btn-lg" onclick="goToScreen('mic')">Continue</button>
+      </div>
+    </div>
+
+    <!-- Mic Permission Screen -->
+    <div id="mic" class="screen">
+      <div class="safe-area">
+        <div class="content">
+          <div style="width: 160px; height: 160px; position: relative; margin-bottom: 48px;">
+            <div style="position: absolute; width: 140px; height: 140px; border-radius: 70px; background: rgba(20, 184, 166, 0.3); left: 10px; top: 10px; animation: pulse 2s infinite;"></div>
+            <div style="position: absolute; width: 100px; height: 100px; border-radius: 50px; background: var(--surface-primary); border: 2px solid var(--accent-primary); left: 30px; top: 30px; display: flex; align-items: center; justify-content: center;">
+              <span style="font-size: 40px;">🎤</span>
+            </div>
+          </div>
+
+          <h2 class="text-center mb-24">We only listen while you recite.</h2>
+
+          <div class="flex flex-col gap-16" style="max-width: 320px;">
+            <div class="flex gap-12">
+              <span style="color: var(--accent-primary);">•</span>
+              <p class="body-medium text-secondary">Only during alarms and practice recitations.</p>
+            </div>
+            <div class="flex gap-12">
+              <span style="color: var(--accent-primary);">•</span>
+              <p class="body-medium text-secondary">Audio is processed to recognise words, not stored as recordings.</p>
+            </div>
+            <div class="flex gap-12">
+              <span style="color: var(--accent-primary);">•</span>
+              <p class="body-medium text-secondary">You'll always see when the mic is on.</p>
+            </div>
+          </div>
+        </div>
+
+        <button class="btn btn-primary btn-lg" onclick="requestMicPermission()">Allow microphone to recite duas</button>
+      </div>
+    </div>
+
+    <!-- First Alarm Screen -->
+    <div id="first-alarm" class="screen">
+      <div class="safe-area">
+        <h2 class="text-center mb-24">Set your first alarm</h2>
+
+        <div class="card mb-24">
+          <div class="time-picker">
+            <div class="time-column">
+              <span class="time-arrow" onclick="adjustTime('hour', 1)">▲</span>
+              <span class="time-value" id="hour-value">05</span>
+              <span class="time-arrow" onclick="adjustTime('hour', -1)">▼</span>
+            </div>
+            <span class="time-colon">:</span>
+            <div class="time-column">
+              <span class="time-arrow" onclick="adjustTime('minute', 5)">▲</span>
+              <span class="time-value" id="minute-value">30</span>
+              <span class="time-arrow" onclick="adjustTime('minute', -5)">▼</span>
+            </div>
+          </div>
+        </div>
+
+        <p class="label text-secondary mb-8">Alarm name</p>
+        <input type="text" class="input mb-24" value="Fajr Alarm" id="alarm-name-input">
+
+        <p class="label text-secondary mb-8">Required recitation</p>
+        <div class="card card-outlined mb-24" onclick="showModal('adhkar-modal')">
+          <div class="flex justify-between items-center">
+            <div>
+              <p class="body-medium">Standard set</p>
+              <p class="body-small text-tertiary">~1–2 minutes</p>
+            </div>
+            <span class="text-tertiary" style="font-size: 24px;">›</span>
+          </div>
+        </div>
+
+        <div class="flex-1"></div>
+        <button class="btn btn-primary btn-lg mb-16" onclick="saveFirstAlarm()">Save alarm</button>
+        <p class="link text-center" onclick="skipFirstAlarm()">I'll set alarms later</p>
+      </div>
+    </div>
+
+    <!-- Home Screen -->
+    <div id="home" class="screen">
+      <div class="safe-area" style="padding-bottom: 0;">
+        <div class="flex justify-between items-center mb-24">
+          <p class="body-medium text-secondary">Assalamu alaikum</p>
+          <div style="width: 40px; height: 40px; border-radius: 20px; background: var(--surface-primary); border: 1px solid var(--border-primary); display: flex; align-items: center; justify-content: center;">
+            <span class="text-accent">M</span>
+          </div>
+        </div>
+
+        <div class="alarm-card fade-in">
+          <div class="alarm-card-header">
+            <span class="label text-tertiary">Next alarm</span>
+            <span class="dua-lock-pill dua-lock-active">Dua-locked</span>
+          </div>
+          <p class="alarm-time" id="home-alarm-time">05:30</p>
+          <p class="alarm-name" id="home-alarm-name">Fajr Alarm</p>
+          <p class="alarm-adhkar">You'll recite: Standard adhkar set (~1–2 min)</p>
+          <div class="alarm-actions">
+            <button class="btn btn-secondary btn-sm" onclick="goToScreen('alarm-edit')">Edit</button>
+            <button class="btn btn-secondary btn-sm">Disable today</button>
+          </div>
+        </div>
+
+        <div class="flex justify-between items-center mb-12 mt-24">
+          <span class="label text-secondary">Other alarms</span>
+          <span class="text-accent body-small" style="cursor: pointer;" onclick="goToScreen('alarm-edit')">+ Add</span>
+        </div>
+
+        <div class="card mb-8" onclick="goToScreen('alarm-edit')">
+          <div class="flex justify-between items-center">
+            <div>
+              <div class="flex items-center gap-8 mb-4">
+                <span class="h4">07:30</span>
+                <span class="body-medium text-secondary">Workday alarm</span>
+              </div>
+              <p class="body-small text-tertiary">Light adhkar set</p>
+            </div>
+            <div class="toggle active" onclick="event.stopPropagation();this.classList.toggle('active')"></div>
+          </div>
+        </div>
+
+        <button class="btn btn-secondary mt-24" onclick="goToScreen('alarm-edit')">+ Add new alarm</button>
+      </div>
+
+      <div class="tab-bar">
+        <div class="tab-item active" onclick="goToScreen('home')">
+          <span class="tab-icon">🏠</span>
+          <span class="tab-label">Home</span>
+        </div>
+        <div class="tab-item" onclick="goToScreen('progress')">
+          <span class="tab-icon">📈</span>
+          <span class="tab-label">Progress</span>
+        </div>
+        <div class="tab-item" onclick="goToScreen('settings')">
+          <span class="tab-icon">⚙️</span>
+          <span class="tab-label">Settings</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Progress Screen -->
+    <div id="progress" class="screen">
+      <div class="safe-area" style="padding-bottom: 0;">
+        <h2 class="mb-8">Dhikr mornings</h2>
+        <p class="body-medium text-secondary mb-24">How often you turned off alarms by reciting.</p>
+
+        <div class="card stats-card">
+          <div class="stat-item">
+            <p class="stat-number">5</p>
+            <p class="stat-label">Current streak</p>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-item">
+            <p class="stat-number">12</p>
+            <p class="stat-label">Total mornings</p>
+          </div>
+        </div>
+
+        <p class="label text-secondary mb-12">This week</p>
+        <div class="weekly-view">
+          <div class="weekly-day">
+            <div class="weekly-indicator completed">✓</div>
+            <span class="weekly-label">S</span>
+          </div>
+          <div class="weekly-day">
+            <div class="weekly-indicator completed">✓</div>
+            <span class="weekly-label">M</span>
+          </div>
+          <div class="weekly-day">
+            <div class="weekly-indicator completed">✓</div>
+            <span class="weekly-label">T</span>
+          </div>
+          <div class="weekly-day">
+            <div class="weekly-indicator skipped"></div>
+            <span class="weekly-label">W</span>
+          </div>
+          <div class="weekly-day">
+            <div class="weekly-indicator completed">✓</div>
+            <span class="weekly-label">T</span>
+          </div>
+          <div class="weekly-day">
+            <div class="weekly-indicator completed">✓</div>
+            <span class="weekly-label">F</span>
+          </div>
+          <div class="weekly-day">
+            <div class="weekly-indicator"></div>
+            <span class="weekly-label">S</span>
+          </div>
+        </div>
+
+        <p class="label text-secondary mb-12">Recent history</p>
+        <div class="history-item">
+          <div>
+            <p class="body-medium">Fajr Alarm</p>
+            <p class="body-small text-tertiary">Today</p>
+          </div>
+          <div class="history-status">
+            <div class="status-dot completed"></div>
+            <span class="body-small text-accent">Completed</span>
+          </div>
+        </div>
+        <div class="history-item">
+          <div>
+            <p class="body-medium">Fajr Alarm</p>
+            <p class="body-small text-tertiary">Yesterday</p>
+          </div>
+          <div class="history-status">
+            <div class="status-dot completed"></div>
+            <span class="body-small text-accent">Completed</span>
+          </div>
+        </div>
+        <div class="history-item">
+          <div>
+            <p class="body-medium">Fajr Alarm</p>
+            <p class="body-small text-tertiary">2 days ago</p>
+          </div>
+          <div class="history-status">
+            <div class="status-dot skipped"></div>
+            <span class="body-small" style="color: var(--warning);">Skipped</span>
+          </div>
+        </div>
+
+        <div class="card mt-24" style="background: rgba(20, 184, 166, 0.1); border: 1px solid rgba(20, 184, 166, 0.3);">
+          <p class="body-medium text-center" style="color: var(--accent-light); font-style: italic;">
+            Keep it up! You're building momentum.
+          </p>
+        </div>
+      </div>
+
+      <div class="tab-bar">
+        <div class="tab-item" onclick="goToScreen('home')">
+          <span class="tab-icon">🏠</span>
+          <span class="tab-label">Home</span>
+        </div>
+        <div class="tab-item active" onclick="goToScreen('progress')">
+          <span class="tab-icon">📈</span>
+          <span class="tab-label">Progress</span>
+        </div>
+        <div class="tab-item" onclick="goToScreen('settings')">
+          <span class="tab-icon">⚙️</span>
+          <span class="tab-label">Settings</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Settings Screen -->
+    <div id="settings" class="screen">
+      <div class="safe-area" style="padding-bottom: 0;">
+        <h2 class="mb-24">Settings</h2>
+
+        <p class="label text-secondary mb-8">Adhkar & Text</p>
+        <div class="card mb-24" style="padding: 0;">
+          <div class="flex justify-between items-center p-16" style="cursor: pointer;">
+            <span class="body-medium">Default intensity</span>
+            <div class="flex items-center gap-8">
+              <span class="body-medium text-tertiary">Standard</span>
+              <span class="text-tertiary">›</span>
+            </div>
+          </div>
+          <div style="height: 1px; background: var(--border-primary); margin: 0 16px;"></div>
+          <div class="flex justify-between items-center p-16" style="cursor: pointer;">
+            <span class="body-medium">Display mode</span>
+            <div class="flex items-center gap-8">
+              <span class="body-medium text-tertiary">Full</span>
+              <span class="text-tertiary">›</span>
+            </div>
+          </div>
+          <div style="height: 1px; background: var(--border-primary); margin: 0 16px;"></div>
+          <div class="flex justify-between items-center p-16" style="cursor: pointer;">
+            <span class="body-medium">Font size</span>
+            <div class="flex items-center gap-8">
+              <span class="body-medium text-tertiary">Medium</span>
+              <span class="text-tertiary">›</span>
+            </div>
+          </div>
+        </div>
+
+        <p class="label text-secondary mb-8">Voice & Mic</p>
+        <div class="card mb-24" style="padding: 0;">
+          <div class="flex justify-between items-center p-16">
+            <span class="body-medium">Microphone access</span>
+            <span class="body-medium text-accent">Granted</span>
+          </div>
+          <div style="padding: 0 16px 16px;">
+            <p class="body-small text-tertiary">We process your voice for recognition; we don't store raw audio.</p>
+          </div>
+        </div>
+
+        <p class="label text-secondary mb-8">About</p>
+        <div class="card" style="padding: 0;">
+          <div class="flex justify-between items-center p-16">
+            <span class="body-medium">Version</span>
+            <span class="body-medium text-tertiary">1.0.0</span>
+          </div>
+          <div style="height: 1px; background: var(--border-primary); margin: 0 16px;"></div>
+          <div class="p-16">
+            <span class="body-medium">Made with ❤️ for the Ummah</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-bar">
+        <div class="tab-item" onclick="goToScreen('home')">
+          <span class="tab-icon">🏠</span>
+          <span class="tab-label">Home</span>
+        </div>
+        <div class="tab-item" onclick="goToScreen('progress')">
+          <span class="tab-icon">📈</span>
+          <span class="tab-label">Progress</span>
+        </div>
+        <div class="tab-item active" onclick="goToScreen('settings')">
+          <span class="tab-icon">⚙️</span>
+          <span class="tab-label">Settings</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Alarm Edit Screen -->
+    <div id="alarm-edit" class="screen">
+      <div class="safe-area">
+        <div class="flex justify-between items-center mb-24">
+          <span class="body-medium text-accent" style="cursor: pointer;" onclick="goToScreen('home')">Cancel</span>
+          <h4>Edit Alarm</h4>
+          <span style="width: 50px;"></span>
+        </div>
+
+        <div class="card mb-24">
+          <div class="time-picker">
+            <div class="time-column">
+              <span class="time-arrow" onclick="adjustTime('hour', 1)">▲</span>
+              <span class="time-value" id="edit-hour-value">05</span>
+              <span class="time-arrow" onclick="adjustTime('hour', -1)">▼</span>
+            </div>
+            <span class="time-colon">:</span>
+            <div class="time-column">
+              <span class="time-arrow" onclick="adjustTime('minute', 5)">▲</span>
+              <span class="time-value" id="edit-minute-value">30</span>
+              <span class="time-arrow" onclick="adjustTime('minute', -5)">▼</span>
+            </div>
+          </div>
+        </div>
+
+        <p class="label text-secondary mb-8">Alarm name</p>
+        <input type="text" class="input mb-24" value="Fajr Alarm">
+
+        <p class="label text-secondary mb-8">Repeat</p>
+        <div class="day-selector mb-24">
+          <button class="day-btn active">S</button>
+          <button class="day-btn active">M</button>
+          <button class="day-btn active">T</button>
+          <button class="day-btn active">W</button>
+          <button class="day-btn active">T</button>
+          <button class="day-btn active">F</button>
+          <button class="day-btn active">S</button>
+        </div>
+
+        <p class="label text-secondary mb-8">Adhkar set</p>
+        <div class="card card-outlined mb-24">
+          <div class="flex justify-between items-center">
+            <div>
+              <p class="body-medium">Standard morning adhkar</p>
+              <p class="body-small text-tertiary">~1–2 minutes</p>
+            </div>
+            <span class="text-tertiary" style="font-size: 24px;">›</span>
+          </div>
+        </div>
+
+        <div class="card mb-16" style="padding: 16px;">
+          <div class="flex justify-between items-center">
+            <div style="flex: 1; margin-right: 16px;">
+              <p class="body-medium mb-4">Allow snooze?</p>
+              <p class="body-small text-tertiary">Snooze by reciting short dhikr (Subhanallah 10x)</p>
+            </div>
+            <div class="toggle active" onclick="this.classList.toggle('active')"></div>
+          </div>
+        </div>
+
+        <div class="card mb-24" style="padding: 16px;">
+          <div class="flex justify-between items-center">
+            <div style="flex: 1; margin-right: 16px;">
+              <p class="body-medium mb-4">Emergency unlock</p>
+              <p class="body-small text-tertiary">In case you're unable to speak. Marks as 'skipped'.</p>
+            </div>
+            <div class="toggle active" onclick="this.classList.toggle('active')"></div>
+          </div>
+        </div>
+
+        <div class="flex-1"></div>
+        <button class="btn btn-primary btn-lg mb-16" onclick="goToScreen('home')">Save alarm</button>
+        <button class="btn btn-ghost" style="color: var(--error);">Delete Alarm</button>
+      </div>
+    </div>
+
+    <!-- Alarm Ringing Screen -->
+    <div id="ringing" class="screen">
+      <div class="safe-area">
+        <div class="text-center mb-32">
+          <p class="ringing-time" id="ringing-time">05:30</p>
+          <p class="body-large text-secondary">Fajr Alarm</p>
+        </div>
+
+        <div class="dua-card mb-24">
+          <p class="arabic dua-arabic">بِسْمِ ٱللَّٰهِ الَّذِي لَا يَضُرُّ مَعَ اسْمِهِ شَيْءٌ فِي الْأَرْضِ وَلَا فِي السَّمَاءِ وَهُوَ السَّمِيعُ الْعَلِيمُ</p>
+          <p class="dua-transliteration">Bismillāhil-ladhī lā yaḍurru maʿas-mihi shay'un fil-arḍi wa lā fis-samā'i wa Huwas-Samīʿul-ʿAlīm</p>
+          <p class="dua-translation">In the Name of Allah, with whose Name nothing on earth or in heaven can cause harm, and He is the All-Hearing, the All-Knowing.</p>
+        </div>
+
+        <div class="progress-dots mb-24">
+          <div class="progress-dot current"></div>
+          <div class="progress-dot"></div>
+          <div class="progress-dot"></div>
+          <div class="progress-dot"></div>
+        </div>
+
+        <div class="flex-1"></div>
+
+        <div class="voice-indicator">
+          <div class="flex items-center gap-16">
+            <div class="voice-icon listening">🎤</div>
+            <div class="waveform" id="waveform">
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+              <div class="wave-bar"></div>
+            </div>
+          </div>
+          <p class="body-small text-accent" id="voice-status">Listening... recite aloud at your normal pace.</p>
+        </div>
+
+        <button class="btn btn-primary btn-lg mb-16" onclick="simulateRecitation()">Start reciting</button>
+
+        <div class="flex justify-between items-center">
+          <button class="btn btn-secondary btn-sm" style="flex: 0.45;" onclick="showModal('snooze-modal')">Snooze 5 min</button>
+          <span class="body-small text-tertiary" style="cursor: pointer;" onclick="showModal('exit-modal')">I'm not able right now</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Success Screen -->
+    <div id="success" class="screen" style="background: linear-gradient(180deg, #0D1F1C 0%, #1E1B4B 100%);">
+      <div class="safe-area">
+        <div class="success-content">
+          <span class="success-emoji">✨</span>
+          <h1 class="mb-12">Alhamdulillah.</h1>
+          <p class="body-large text-secondary mb-16">You started your day with dhikr.</p>
+          <p class="body-medium text-accent mb-32">Day 6 of your 'Dhikr mornings' streak.</p>
+          <button class="btn btn-primary" style="min-width: 200px;" onclick="goToScreen('home')">Dismiss</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Privacy Modal -->
+    <div id="privacy-modal" class="modal-overlay" onclick="hideModal('privacy-modal')">
+      <div class="modal" onclick="event.stopPropagation()">
+        <h3 class="text-center mb-24">About Microphone Access</h3>
+        <div class="flex flex-col gap-16 mb-24">
+          <div class="flex gap-12">
+            <span style="font-size: 20px;">🎤</span>
+            <p class="body-medium text-secondary">We only listen during alarms and practice recitations.</p>
+          </div>
+          <div class="flex gap-12">
+            <span style="font-size: 20px;">🔒</span>
+            <p class="body-medium text-secondary">Audio is processed locally to recognize words - we don't store recordings.</p>
+          </div>
+          <div class="flex gap-12">
+            <span style="font-size: 20px;">👁</span>
+            <p class="body-medium text-secondary">You'll always see a clear indicator when the mic is active.</p>
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="hideModal('privacy-modal')">Got it</button>
+      </div>
+    </div>
+
+    <!-- Snooze Modal -->
+    <div id="snooze-modal" class="modal-overlay" onclick="hideModal('snooze-modal')">
+      <div class="modal text-center" onclick="event.stopPropagation()">
+        <h4 class="mb-24">To snooze, recite 'Subhanallah' 10 times</h4>
+        <p class="arabic" style="font-size: 32px; margin-bottom: 8px;">سُبْحَانَ اللَّهِ</p>
+        <p class="dua-transliteration mb-24">Subḥānallāh</p>
+
+        <div class="progress-dots mb-12">
+          <div class="progress-dot" id="snooze-dot-0"></div>
+          <div class="progress-dot" id="snooze-dot-1"></div>
+          <div class="progress-dot" id="snooze-dot-2"></div>
+          <div class="progress-dot" id="snooze-dot-3"></div>
+          <div class="progress-dot" id="snooze-dot-4"></div>
+          <div class="progress-dot" id="snooze-dot-5"></div>
+          <div class="progress-dot" id="snooze-dot-6"></div>
+          <div class="progress-dot" id="snooze-dot-7"></div>
+          <div class="progress-dot" id="snooze-dot-8"></div>
+          <div class="progress-dot" id="snooze-dot-9"></div>
+        </div>
+        <p class="h3 mb-24" id="snooze-count">0/10</p>
+
+        <button class="btn btn-primary mb-12" onclick="incrementSnooze()">I've said it</button>
+        <p class="link" onclick="hideModal('snooze-modal')">Cancel</p>
+      </div>
+    </div>
+
+    <!-- Exit Modal -->
+    <div id="exit-modal" class="modal-overlay" onclick="hideModal('exit-modal')">
+      <div class="modal" onclick="event.stopPropagation()">
+        <h3 class="text-center mb-12">Turn off without adhkar?</h3>
+        <p class="body-medium text-secondary text-center mb-24">
+          We'll turn off the alarm and mark this as 'Skipped dhikr' for today. That's okay – you can return stronger tomorrow in shā' Allāh.
+        </p>
+        <div class="flex gap-12">
+          <button class="btn btn-secondary" style="flex: 1;" onclick="hideModal('exit-modal')">Cancel</button>
+          <button class="btn btn-danger" style="flex: 1;" onclick="skipAlarm()">Turn off</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // State
+    let currentScreen = 'welcome';
+    let hour = 5;
+    let minute = 30;
+    let snoozeCount = 0;
+    let duaIndex = 0;
+    let completedDuas = 0;
+
+    // Navigation
+    function goToScreen(screenId) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById(screenId).classList.add('active');
+      currentScreen = screenId;
+
+      // Update tab bar active states
+      if (['home', 'progress', 'settings'].includes(screenId)) {
+        updateTabBar(screenId);
+      }
+    }
+
+    function updateTabBar(activeTab) {
+      document.querySelectorAll('.tab-item').forEach(tab => {
+        tab.classList.remove('active');
+      });
+    }
+
+    // Modals
+    function showModal(modalId) {
+      document.getElementById(modalId).classList.add('active');
+    }
+
+    function hideModal(modalId) {
+      document.getElementById(modalId).classList.remove('active');
+    }
+
+    // Display mode selection
+    function selectDisplayMode(element, mode) {
+      document.querySelectorAll('#language .card').forEach(card => {
+        card.classList.remove('card-highlight');
+        card.classList.add('card-outlined');
+        card.querySelector('.radio').classList.remove('selected');
+      });
+      element.classList.remove('card-outlined');
+      element.classList.add('card-highlight');
+      element.querySelector('.radio').classList.add('selected');
+
+      // Update preview
+      const translit = document.getElementById('preview-translit');
+      const translation = document.getElementById('preview-translation');
+      if (mode === 'arabic') {
+        translit.style.display = 'none';
+        translation.style.display = 'none';
+      } else if (mode === 'translit') {
+        translit.style.display = 'block';
+        translation.style.display = 'none';
+      } else {
+        translit.style.display = 'block';
+        translation.style.display = 'block';
+      }
+    }
+
+    // Font size selection
+    function selectFontSize(element, size) {
+      element.parentElement.querySelectorAll('.btn').forEach(btn => {
+        btn.style.background = 'transparent';
+        btn.style.color = 'var(--text-primary)';
+      });
+      element.style.background = 'var(--accent-primary)';
+      element.style.color = 'var(--bg-primary)';
+    }
+
+    // Intensity selection
+    function selectIntensity(element, intensity) {
+      document.querySelectorAll('#intensity .card').forEach(card => {
+        card.classList.remove('card-highlight');
+        card.classList.add('card-outlined');
+        card.querySelector('.radio').classList.remove('selected');
+      });
+      element.classList.remove('card-outlined');
+      element.classList.add('card-highlight');
+      element.querySelector('.radio').classList.add('selected');
+    }
+
+    // Mic permission
+    function requestMicPermission() {
+      // In a real app, this would request actual permission
+      goToScreen('first-alarm');
+    }
+
+    // Time picker
+    function adjustTime(type, delta) {
+      if (type === 'hour') {
+        hour = (hour + delta + 24) % 24;
+        document.getElementById('hour-value').textContent = hour.toString().padStart(2, '0');
+        document.getElementById('edit-hour-value').textContent = hour.toString().padStart(2, '0');
+      } else {
+        minute = (minute + delta + 60) % 60;
+        document.getElementById('minute-value').textContent = minute.toString().padStart(2, '0');
+        document.getElementById('edit-minute-value').textContent = minute.toString().padStart(2, '0');
+      }
+    }
+
+    // Save first alarm
+    function saveFirstAlarm() {
+      const time = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+      document.getElementById('home-alarm-time').textContent = time;
+      document.getElementById('home-alarm-name').textContent = document.getElementById('alarm-name-input').value || 'Fajr Alarm';
+      goToScreen('home');
+    }
+
+    function skipFirstAlarm() {
+      goToScreen('home');
+    }
+
+    // Snooze
+    function incrementSnooze() {
+      snoozeCount++;
+      document.getElementById('snooze-count').textContent = `${snoozeCount}/10`;
+
+      for (let i = 0; i < snoozeCount; i++) {
+        document.getElementById(`snooze-dot-${i}`).classList.add('completed');
+      }
+
+      if (snoozeCount >= 10) {
+        hideModal('snooze-modal');
+        goToScreen('home');
+        snoozeCount = 0;
+        // Reset dots
+        for (let i = 0; i < 10; i++) {
+          document.getElementById(`snooze-dot-${i}`).classList.remove('completed');
+        }
+        document.getElementById('snooze-count').textContent = '0/10';
+      }
+    }
+
+    // Skip alarm
+    function skipAlarm() {
+      hideModal('exit-modal');
+      goToScreen('home');
+    }
+
+    // Simulate recitation completion
+    function simulateRecitation() {
+      const dots = document.querySelectorAll('#ringing .progress-dot');
+      const statusEl = document.getElementById('voice-status');
+
+      // Start listening animation
+      statusEl.textContent = 'Listening... recite aloud at your normal pace.';
+
+      // Simulate completion after 2 seconds
+      setTimeout(() => {
+        statusEl.textContent = 'Voice detected...';
+
+        setTimeout(() => {
+          completedDuas++;
+          dots[duaIndex].classList.remove('current');
+          dots[duaIndex].classList.add('completed');
+
+          if (completedDuas < 4) {
+            duaIndex++;
+            dots[duaIndex].classList.add('current');
+            statusEl.textContent = `Dua completed (${completedDuas}/4). Keep going.`;
+          } else {
+            // All done!
+            goToScreen('success');
+            // Reset for next time
+            completedDuas = 0;
+            duaIndex = 0;
+          }
+        }, 1000);
+      }, 2000);
+    }
+
+    // Demo: Allow triggering alarm screen
+    function triggerAlarm() {
+      document.getElementById('ringing-time').textContent =
+        `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+      goToScreen('ringing');
+    }
+
+    // Day button toggle
+    document.querySelectorAll('.day-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        this.classList.toggle('active');
+      });
+    });
+
+    // Keyboard shortcut for demo
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'r' || e.key === 'R') {
+        triggerAlarm();
+      }
+    });
+  </script>
+</body>
+</html>
